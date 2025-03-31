@@ -8,16 +8,18 @@
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Système de Gestion de l'Hôtel California</h1>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Système de Gestion de l'Hôtel California</h1>
 
-        <nav class="navigation">
-            <a href="chambres/listChambres.php"><i class="fas fa-bed"></i> Gestion des Chambres</a>
-            <a href="clients/listClients.php"><i class="fas fa-users"></i> Gestion des Clients</a>
-            <a href="reservations/listReservations.php"><i class="fas fa-calendar-alt"></i> Gestion des Réservations</a>
+        <nav class="nav nav-pills justify-content-center mb-4">
+            <a class="nav-link" href="chambres/listChambres.php"><i class="fas fa-bed me-1"></i> Gestion des Chambres</a>
+            <a class="nav-link" href="clients/listClients.php"><i class="fas fa-users me-1"></i> Gestion des Clients</a>
+            <a class="nav-link" href="reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Gestion des Réservations</a>
         </nav>
 
-        <img src="./assets/HotelCalifornia.jpg" alt="Hôtel de nuit" class="hotel-image">
+        <div class="text-center">
+            <img src="./assets/HotelCalifornia.jpg" alt="Hôtel de nuit" class="img-fluid rounded hotel-image">
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
