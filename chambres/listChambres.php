@@ -1,7 +1,7 @@
 <?php
 require_once '../config/db_connect.php';
 $conn = openDatabaseConnection();
-$stmt = $conn->query("SELECT * FROM chambres ORDER BY numero");
+$stmt = $conn->query("SELECT * FROM chambre ORDER BY numero");
 $chambres = $stmt->fetchAll(PDO::FETCH_ASSOC);
 closeDatabaseConnection($conn);
 ?>
@@ -55,8 +55,8 @@ closeDatabaseConnection($conn);
                 <?php foreach ($chambres as $chambre): ?>
                     <tr>
                         <td><?php echo $chambre['idChambre']; ?></td>
-                        <td><?= htmlspecialchars($chambre['numero']) ?></td>
-                        <td><?= htmlspecialchars($chambre['capacite']) ?></td>
+                        <td><?= $chambre['numero'] ?></td> 
+                        <td><?= $chambre['capacite'] ?></td>
                         <td><?= $chambre['disponibilite'] ? 'Oui' : 'Non' ?></td>
                         <td>
                             <a href="editChambre.php?id=<?= $chambre['idChambre'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Modifier</a>

@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $disponibilite = isset($_POST['disponibilite']) ? 1 : 0;
 
     $conn = openDatabaseConnection();
-    $stmt = $conn->prepare("INSERT INTO chambres (numero, capacite, disponibilite) VALUES (?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO chambre (numero, capacite, disponibilite) VALUES (?, ?, ?)");
     $stmt->execute([$numero, $capacite, $disponibilite]);
     closeDatabaseConnection($conn);
 

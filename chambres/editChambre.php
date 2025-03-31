@@ -22,13 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $stmt = $conn->prepare("UPDATE chambres SET numero = ?, capacite = ?, disponibilite = ? WHERE idChambre = ?");
+        $stmt = $conn->prepare("UPDATE chambre SET numero = ?, capacite = ?, disponibilite = ? WHERE idChambre = ?");
         $stmt->execute([$numero, $capacite, $disponibilite, $id]);
         header("Location: listChambres.php?success=1");
         exit;
     }
 } else {
-    $stmt = $conn->prepare("SELECT * FROM chambres WHERE idChambre = ?");
+    $stmt = $conn->prepare("SELECT * FROM chambre WHERE idChambre = ?");
     $stmt->execute([$id]);
     $chambre = $stmt->fetch(PDO::FETCH_ASSOC);
 
