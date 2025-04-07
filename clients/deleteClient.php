@@ -22,7 +22,6 @@ try {
         exit;
     }
 
-    // Vérifier si le client est utilisé dans des réservations
     $stmt = $conn->prepare("SELECT COUNT(*) FROM reservation WHERE idClient = ?");
     $stmt->execute([$id]);
     $count = $stmt->fetchColumn();

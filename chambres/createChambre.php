@@ -4,12 +4,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $numero = $_POST['numero'];
     $capacite = (int)$_POST['capacite'];
     $disponibilite = isset($_POST['disponibilite']) ? 1 : 0;
-
     $conn = openDatabaseConnection();
     $stmt = $conn->prepare("INSERT INTO chambre (numero, capacite, disponibilite) VALUES (?, ?, ?)");
     $stmt->execute([$numero, $capacite, $disponibilite]);
     closeDatabaseConnection($conn);
-
     header("Location: listChambres.php");
     exit;
 }
