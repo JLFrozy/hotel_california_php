@@ -9,14 +9,14 @@ function formatDate($date)
 }
 // Récupération des réservations avec les informations des clients et des chambres
 $conn = openDatabaseConnection();
-$query = "SELECT r.id, r.date_arrivee, r.date_depart,
- c.nom AS client_nom, c.telephone AS client_telephone, c.email AS client_email,
-c.nombre_personnes,
- ch.numero AS chambre_numero, ch.capacite AS chambre_capacite
- FROM reservations r
- JOIN clients c ON r.client_id = c.id
- JOIN chambres ch ON r.chambre_id = ch.id
- ORDER BY r.date_arrivee DESC";
+$query = "SELECT r.idReservation AS id, r.dateDebut AS date_arrivee, r.dateFin AS date_depart,
+    cl.nom AS client_nom, cl.telephone AS client_telephone, cl.email AS client_email,
+    cl.nbPersonnes AS nombre_personnes,
+    ch.numero AS chambre_numero, ch.capacite AS chambre_capacite
+    FROM reservation r
+    JOIN client cl ON r.idClient = cl.idClient
+    JOIN chambre ch ON r.idChambre = ch.idChambre
+    ORDER BY r.dateDebut DESC";
 $stmt = $conn->query($query);
 $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 closeDatabaseConnection($conn);
@@ -28,20 +28,20 @@ closeDatabaseConnection($conn);
     <title>Liste des Réservations</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Lien vers la feuille de style externe -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="../assets/style.css">
 </head>
 
 <body>
-    <div class="container">
+    <div class="container mt-5">
         <h1>Liste des Réservations</h1>
 
-        <div class="actions">
+        <div class="mb-3">
             <a href="createReservation.php" class="btn btn-success">Nouvelle Réservation</a>
         </div>
 
-        <table>
-            <thead>
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
                 <tr>
                     <th>ID</th>
                     <th>Client</th>
@@ -62,16 +62,16 @@ closeDatabaseConnection($conn);
                         $statut = '';
 
                         if ($reservation['date_depart'] < $aujourd_hui) {
-                            $statut_class = 'status-past';
+                            $statut_class = 'table-danger';
                             $statut = 'Terminée';
                         } elseif (
                             $reservation['date_arrivee'] <= $aujourd_hui &&
                             $reservation['date_depart'] >= $aujourd_hui
                         ) {
-                            $statut_class = 'status-active';
+                            $statut_class = 'table-success';
                             $statut = 'En cours';
                         } else {
-                            $statut_class = '';
+                            $statut_class = 'table-warning';
                             $statut = 'À venir';
                         }
                         ?>
@@ -79,12 +79,8 @@ closeDatabaseConnection($conn);
                             <td><?= $reservation['id'] ?></td>
                             <td><?= htmlspecialchars($reservation['client_nom']) ?></td>
                             <td>
-                                <strong>Tél:</strong>
-                                <?=
-                                    htmlspecialchars($reservation['client_telephone']) ?><br>
-                                <strong>Email:</strong>
-                                <?=
-                                    htmlspecialchars($reservation['client_email']) ?>
+                                <strong>Tél:</strong> <?= htmlspecialchars($reservation['client_telephone']) ?><br>
+                                <strong>Email:</strong> <?= htmlspecialchars($reservation['client_email']) ?>
                             </td>
                             <td>N° <?= htmlspecialchars($reservation['chambre_numero']) ?>
                                 (<?= $reservation['chambre_capacite'] ?> pers.)</td>
@@ -93,9 +89,10 @@ closeDatabaseConnection($conn);
                             <td><?= formatDate($reservation['date_depart']) ?></td>
                             <td class="<?= $statut_class ?>"><?= $statut ?></td>
                             <td>
-                                <a href="viewReservation.php?id=<?= $reservation['id'] ?>" class="btn btn-info">Voir</a>
-                                <a href="editReservation.php?id=<?= $reservation['id'] ?>" class="btn btn-primary">Modifier</a>
-                                <a href="deleteReservation.php?id=<?= $reservation['id'] ?>" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation?');">
+                                <a href="viewReservation.php?id=<?= $reservation['id'] ?>" class="btn btn-info btn-sm">Voir</a>
+                                <a href="editReservation.php?id=<?= $reservation['id'] ?>" class="btn btn-primary btn-sm">Modifier</a>
+                                <a href="deleteReservation.php?id=<?= $reservation['id'] ?>" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation?');">
                                     Supprimer
                                 </a>
                             </td>
@@ -103,12 +100,14 @@ closeDatabaseConnection($conn);
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="9">Aucune réservation trouvée.</td>
+                        <td colspan="9" class="text-center">Aucune réservation trouvée.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>
