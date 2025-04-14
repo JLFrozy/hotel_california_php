@@ -8,14 +8,30 @@
     <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Système de Gestion de l'Hôtel California</h1>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.php">Hôtel California</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="chambres/listChambres.php"><i class="fas fa-bed me-1"></i> Chambres</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="clients/listClients.php"><i class="fas fa-users me-1"></i> Clients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Réservations</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-        <nav class="nav nav-pills justify-content-center mb-4">
-            <a class="nav-link" href="chambres/listChambres.php"><i class="fas fa-bed me-1"></i> Gestion des Chambres</a>
-            <a class="nav-link" href="clients/listClients.php"><i class="fas fa-users me-1"></i> Gestion des Clients</a>
-            <a class="nav-link" href="reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Gestion des Réservations</a>
-        </nav>
+    <div class="container mt-4 text-center">
+        <i class="fa-solid fa-cart-flatbed-suitcase fa-3x"></i> <h1 class="mb-4">Système de Gestion de l'Hôtel California</h1>
 
         <div class="text-center">
             <img src="./assets/HotelCalifornia.jpg" alt="Hôtel de nuit" class="img-fluid rounded hotel-image">

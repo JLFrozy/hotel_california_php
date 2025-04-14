@@ -84,11 +84,11 @@ try {
             </div>
             <div class="mb-3">
                 <label for="telephone" class="form-label">Téléphone</label>
-                <input type="text" class="form-control" id="telephone" name="telephone" value="<?= htmlspecialchars($client['telephone']) ?>">
+                <input type="text" class="form-control" id="telephone" name="telephone" value="<?= htmlspecialchars($client['telephone']) ?>" required>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($client['email']) ?>">
+                <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($client['email']) ?>" required>
             </div>
             <div class="mb-3">
                 <label for="nbPersonnes" class="form-label">Nombre de Personnes</label>

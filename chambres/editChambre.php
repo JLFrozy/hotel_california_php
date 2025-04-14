@@ -65,7 +65,7 @@ closeDatabaseConnection($conn);
                         <a class="nav-link" href="../clients/listClients.php"><i class="fas fa-users me-1"></i> Clients</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Réservations</a>
+                        <a class="nav-link" href="../reservations/listReservations.php"><i class="fas fa-calendar-alt me-1" ></i> Réservations</a>
                     </li>
                 </ul>
             </div>
