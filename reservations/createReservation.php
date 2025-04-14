@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     closeDatabaseConnection($conn);
 
     header('Location: listReservations.php');
+
     exit;
 }
 ?>
@@ -42,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </select>
             </div>
             <div class="mb-3">
-                <label for="idChambre" class="form-label">Chambre</label>
+                <label for="idChambre" class="form-label">Chambre </label>
                 <select name="idChambre" id="idChambre" class="form-select">
                     <?php foreach ($chambres as $chambre): ?>
                         <option value="<?= $chambre['idChambre'] ?>">N° <?= $chambre['numero'] ?></option>
