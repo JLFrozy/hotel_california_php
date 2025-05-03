@@ -3,61 +3,7 @@ require_once '../config/db_connect.php';
 require_once '../auth/authFunctions.php';
 requireRole("manager"); // Rôle requis pour modifier une chambre
 
-// Récupérer l'ID de la chambre à modifier
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    $encodedMessage = urlencode("ERREUR : ID de chambre invalide.");
-    header("Location: listChambres.php?message=$encodedMessage");
-    exit;
-}
-$idChambre = $_GET['id'];
-
-$conn = openDatabaseConnection();
-
-// Traitement du formulaire de modification
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $numero = $_POST['numero'];
-    $capacite = (int)$_POST['capacite'];
-    $disponibilite = isset($_POST['disponibilite']) ? 1 : 0;
-
-    // Validation des données (similaire à createChambre.php)
-    $errors = [];
-    if (empty($numero)) {
-        $errors[] = "Le numéro de chambre est obligatoire.";
-    }
-    if ($capacite <= 0) {
-        $errors[] = "La capacité doit être un nombre positif.";
-    }
-
-    if (!empty($errors)) {
-        $encodedMessage = urlencode("ERREUR : " . implode("<br>", $errors));
-        header("Location: editChambre.php?id=$idChambre&message=$encodedMessage");
-        exit;
-    }
-
-    $stmt = $conn->prepare("UPDATE chambre SET numero = ?, capacite = ?, disponibilite = ? WHERE idChambre = ?");
-    if ($stmt->execute([$numero, $capacite, $disponibilite, $idChambre])) {
-        $encodedMessage = urlencode("SUCCÈS : Chambre mise à jour avec succès.");
-        header("Location: listChambres.php?message=$encodedMessage");
-        exit;
-    } else {
-        $encodedMessage = urlencode("ERREUR : Erreur lors de la mise à jour de la chambre.");
-        header("Location: editChambre.php?id=$idChambre&message=$encodedMessage");
-        exit;
-    }
-}
-
-// Récupérer les informations de la chambre pour affichage dans le formulaire
-$stmt = $conn->prepare("SELECT * FROM chambre WHERE idChambre = ?");
-$stmt->execute([$idChambre]);
-$chambre = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$chambre) {
-    $encodedMessage = urlencode("ERREUR : Chambre non trouvée.");
-    header("Location: listChambres.php?message=$encodedMessage");
-    exit;
-}
-
-closeDatabaseConnection($conn);
+include_once '../assets/gestionMessage.php';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -70,6 +16,39 @@ closeDatabaseConnection($conn);
     <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../index.php">Hôtel California</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="listChambres.php"><i class="fas fa-bed me-1"></i> Chambres</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../clients/listClients.php"><i class="fas fa-users me-1"></i> Clients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Réservations</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <?php if (isLoggedIn()): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/logout.php"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/login.php"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-4">
         <h1 class="mb-4">Modifier la Chambre N° <?= htmlspecialchars($chambre['numero']) ?></h1>
         <form method="post">

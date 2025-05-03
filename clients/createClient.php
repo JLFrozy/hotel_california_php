@@ -1,5 +1,9 @@
 <?php
 require_once '../config/db_connect.php';
+require_once '../auth/authFunctions.php';
+requireRole("directeur"); // Rôle requis pour créer un Client
+
+include_once '../assets/gestionMessage.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom = $_POST['nom'];

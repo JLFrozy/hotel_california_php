@@ -46,6 +46,7 @@ include_once 'assets/gestionMessage.php';
     </nav>
 
     <div class="container mt-4 text-center">
+        <?php displayMessage(); ?> <!- AJOUT DE CETTE LIGNE -->
         <i class="fa-solid fa-cart-flatbed-suitcase fa-3x"></i> <h1 class="mb-4">Système de Gestion de l'Hôtel California</h1>
 
         <div class="text-center">

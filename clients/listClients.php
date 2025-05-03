@@ -1,7 +1,10 @@
 <?php
 require_once '../config/db_connect.php';
+require_once '../auth/authFunctions.php';
+requireRole("standard"); // Rôle requis pour la liste des clients
 
-<?php include_once '../assets/gestionMessage.php'; ?>
+// Inclusion du fichier gestionMessage.php
+include_once '../assets/gestionMessage.php';
 
 try {
     $conn = openDatabaseConnection();
@@ -42,13 +45,24 @@ try {
                         <a class="nav-link" href="../reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Réservations</a>
                     </li>
                 </ul>
+                <ul class="navbar-nav">
+                    <?php if (isLoggedIn()): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/logout.php"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/login.php"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
             </div>
         </div>
     </nav>
 
     <div class="container mt-4">
         <h1 class="mb-4">Liste des Clients</h1>
-
+        <?php displayMessage(); ?>
         <a href="createClient.php" class="btn btn-primary mb-3"><i class="fas fa-plus me-1"></i> Ajouter un client</a>
         <table class="table table-striped table-bordered">
             <thead class="table-dark">
@@ -76,7 +90,7 @@ try {
                             <td><?= htmlspecialchars($client['nbPersonnes']) ?></td>
                             <td>
                                 <a href="editClient.php?id=<?= $client['idClient'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Modifier</a>
-                                <a href="deleteClient.php?id=<?= $client['idClient'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr?')"><i class="fas fa-trash"></i> Supprimer</a>
+                                <a href="deleteClient.php?id=<?= $client['idClient'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce client ?')"><i class="fas fa-trash"></i> Supprimer</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

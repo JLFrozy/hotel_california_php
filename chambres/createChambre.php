@@ -4,40 +4,6 @@ require_once '../auth/authFunctions.php';
 requireRole("directeur"); // Rôle requis pour créer une chambre
 
 include_once '../assets/gestionMessage.php';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $numero = $_POST['numero'];
-    $capacite = (int)$_POST['capacite'];
-    $disponibilite = isset($_POST['disponibilite']) ? 1 : 0;
-
-    // Validation des données
-    $errors = [];
-    if (empty($numero)) {
-        $errors[] = "Le numéro de chambre est obligatoire.";
-    }
-    if ($capacite <= 0) {
-        $errors[] = "La capacité doit être un nombre positif.";
-    }
-
-    if (!empty($errors)) {
-        $encodedMessage = urlencode("ERREUR : " . implode("<br>", $errors));
-        header("Location: listChambres.php?message=$encodedMessage");
-        exit;
-    }
-
-    $conn = openDatabaseConnection();
-    $stmt = $conn->prepare("INSERT INTO chambre (numero, capacite, disponibilite) VALUES (?, ?, ?)");
-    if ($stmt->execute([$numero, $capacite, $disponibilite])) {
-        $encodedMessage = urlencode("SUCCÈS : Chambre ajoutée avec succès.");
-        header("Location: listChambres.php?message=$encodedMessage");
-        exit;
-    } else {
-        $encodedMessage = urlencode("ERREUR : Erreur lors de l'ajout de la chambre.");
-        header("Location: listChambres.php?message=$encodedMessage");
-        exit;
-    }
-    closeDatabaseConnection($conn);
-}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -50,6 +16,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../index.php">Hôtel California</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="listChambres.php"><i class="fas fa-bed me-1"></i> Chambres</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../clients/listClients.php"><i class="fas fa-users me-1"></i> Clients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Réservations</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <?php if (isLoggedIn()): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/logout.php"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/login.php"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container mt-4">
         <h1 class="mb-4">Ajouter une Chambre</h1>
         <form method="post">
