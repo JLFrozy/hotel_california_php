@@ -1,5 +1,7 @@
 <?php
 require_once '../config/db_connect.php';
+require_once '../auth/authFunctions.php';
+requireRole("manager"); 
 
 $id = $_GET['id'];
 
@@ -100,6 +102,17 @@ try {
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="../reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Réservations</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <?php if (isLoggedIn()): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/logout.php"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/login.php"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>

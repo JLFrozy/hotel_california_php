@@ -1,6 +1,7 @@
 <?php
 require_once '../config/db_connect.php';
-
+require_once '../auth/authFunctions.php';
+requireRole("standard"); // Rôle requis 
 // La fonction pour formater les dates
 function formatDate($date)
 {
@@ -8,9 +9,16 @@ function formatDate($date)
     return date('d/m/Y', $timestamp);
 }
 
-<?php include_once '../assets/gestionMessage.php'; ?>
+include_once '../assets/gestionMessage.php'; ?>
 
-// Récupération des réservations avec les informations des clients et des chambres
+<?php
+// Vérification de l'authentification plus tard
+if (!isLoggedIn() || !hasRole("standard")) {
+    header("Location: ../auth/login.php?message=" . urlencode("Vous devez être connecté pour accéder à la liste des réservations."));
+    exit;
+}
+
+// Récupération des réservations (ce code ne s'exécutera que si l'utilisateur est autorisé)
 $conn = openDatabaseConnection();
 $query = "SELECT r.idReservation AS id, r.dateDebut AS date_arrivee, r.dateFin AS date_depart,
     cl.nom AS client_nom, cl.telephone AS client_telephone, cl.email AS client_email,
@@ -54,6 +62,17 @@ closeDatabaseConnection($conn);
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="../reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Réservations</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <?php if (isLoggedIn()): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/logout.php"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../auth/login.php"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>

@@ -1,6 +1,7 @@
 <?php
 require_once '../config/db_connect.php';
-
+require_once '../auth/authFunctions.php';
+requireRole("manager"); 
 $id = $_GET['id'];
 
 try {
