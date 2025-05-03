@@ -1,19 +1,25 @@
 <?php
 require_once '../config/db_connect.php';
-$conn = openDatabaseConnection();
+require_once '../auth/authFunctions.php';
+requireRole("manager"); // Rôle requis pour modifier une chambre
 
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-if ($id <= 0) {
+// Récupérer l'ID de la chambre à modifier
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $encodedMessage = urlencode("ERREUR : ID de chambre invalide.");
     header("Location: listChambres.php?message=$encodedMessage");
     exit;
 }
+$idChambre = $_GET['id'];
 
+$conn = openDatabaseConnection();
+
+// Traitement du formulaire de modification
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $numero = $_POST['numero'];
     $capacite = (int)$_POST['capacite'];
     $disponibilite = isset($_POST['disponibilite']) ? 1 : 0;
 
+    // Validation des données (similaire à createChambre.php)
     $errors = [];
     if (empty($numero)) {
         $errors[] = "Le numéro de chambre est obligatoire.";
@@ -22,29 +28,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "La capacité doit être un nombre positif.";
     }
 
-    if (empty($errors)) {
-        $stmt = $conn->prepare("UPDATE chambre SET numero = ?, capacite = ?, disponibilite = ? WHERE idChambre = ?");
-        if ($stmt->execute([$numero, $capacite, $disponibilite, $id])) {
-            $encodedMessage = urlencode("SUCCÈS : Chambre modifiée avec succès.");
-            header("Location: listChambres.php?message=$encodedMessage");
-            exit;
-        } else {
-            $encodedMessage = urlencode("ERREUR : Erreur lors de la modification de la chambre.");
-            header("Location: listChambres.php?message=$encodedMessage");
-            exit;
-        }
+    if (!empty($errors)) {
+        $encodedMessage = urlencode("ERREUR : " . implode("<br>", $errors));
+        header("Location: editChambre.php?id=$idChambre&message=$encodedMessage");
+        exit;
     }
-} else {
-    $stmt = $conn->prepare("SELECT * FROM chambre WHERE idChambre = ?");
-    $stmt->execute([$id]);
-    $chambre = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$chambre) {
-        $encodedMessage = urlencode("ERREUR : Chambre non trouvée.");
+    $stmt = $conn->prepare("UPDATE chambre SET numero = ?, capacite = ?, disponibilite = ? WHERE idChambre = ?");
+    if ($stmt->execute([$numero, $capacite, $disponibilite, $idChambre])) {
+        $encodedMessage = urlencode("SUCCÈS : Chambre mise à jour avec succès.");
         header("Location: listChambres.php?message=$encodedMessage");
+        exit;
+    } else {
+        $encodedMessage = urlencode("ERREUR : Erreur lors de la mise à jour de la chambre.");
+        header("Location: editChambre.php?id=$idChambre&message=$encodedMessage");
         exit;
     }
 }
+
+// Récupérer les informations de la chambre pour affichage dans le formulaire
+$stmt = $conn->prepare("SELECT * FROM chambre WHERE idChambre = ?");
+$stmt->execute([$idChambre]);
+$chambre = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$chambre) {
+    $encodedMessage = urlencode("ERREUR : Chambre non trouvée.");
+    header("Location: listChambres.php?message=$encodedMessage");
+    exit;
+}
+
 closeDatabaseConnection($conn);
 ?>
 <!DOCTYPE html>
@@ -58,55 +70,24 @@ closeDatabaseConnection($conn);
     <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="../index.php">Hôtel California</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../chambres/listChambres.php"><i class="fas fa-bed me-1"></i> Chambres</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../clients/listClients.php"><i class="fas fa-users me-1"></i> Clients</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../reservations/listReservations.php"><i class="fas fa-calendar-alt me-1" ></i> Réservations</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <div class="container mt-4">
-        <h1 class="mb-4">Modifier une Chambre</h1>
-
-        <?php if (isset($errors) && !empty($errors)): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <?php foreach ($errors as $error): ?>
-                    <p class="mb-0"><?= $error ?></p>
-                <?php endforeach; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        <?php endif; ?>
-
+        <h1 class="mb-4">Modifier la Chambre N° <?= htmlspecialchars($chambre['numero']) ?></h1>
         <form method="post">
+            <input type="hidden" name="idChambre" value="<?= $chambre['idChambre'] ?>">
             <div class="mb-3">
                 <label for="numero" class="form-label">Numéro de Chambre</label>
                 <input type="text" class="form-control" id="numero" name="numero" value="<?= htmlspecialchars($chambre['numero']) ?>" required>
             </div>
             <div class="mb-3">
                 <label for="capacite" class="form-label">Capacité (nombre de personnes)</label>
-                <input type="number" class="form-control" id="capacite" name="capacite" value="<?= $chambre['capacite'] ?>" min="1" required>
+                <input type="number" class="form-control" id="capacite" name="capacite" min="1" value="<?= $chambre['capacite'] ?>" required>
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="disponibilite" name="disponibilite" value="1" <?= $chambre['disponibilite'] ? 'checked' : '' ?>>
                 <label class="form-check-label" for="disponibilite">Disponible</label>
             </div>
             <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Enregistrer les modifications</button>
-            <a href="listChambres.php" class="btn btn-secondary"><i class="fas fa-arrow-left me-1"></i> Annuler</a>
+            <a href="listChambres.php" class="btn btn-secondary"><i class="fas fa-arrow-left me-1"></i> Retour à la liste</a>
         </form>
     </div>
 

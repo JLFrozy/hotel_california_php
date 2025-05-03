@@ -8,15 +8,7 @@ function formatDate($date)
     return date('d/m/Y', $timestamp);
 }
 
-// Récupération et affichage du message s'il existe
-if (isset($_GET['message'])) {
-    $message = urldecode($_GET['message']);
-    $alertClass = (strpos($message, 'ERREUR') !== false) ? 'alert-danger' : 'alert-success';
-    echo '<div class="alert ' . $alertClass . ' alert-dismissible fade show" role="alert">';
-    echo htmlspecialchars($message);
-    echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
-    echo '</div>';
-}
+<?php include_once '../assets/gestionMessage.php'; ?>
 
 // Récupération des réservations avec les informations des clients et des chambres
 $conn = openDatabaseConnection();

@@ -1,3 +1,6 @@
+<?php
+require_once 'auth/authFunctions.php';
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -15,7 +18,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="chambres/listChambres.php"><i class="fas fa-bed me-1"></i> Chambres</a>
                     </li>
@@ -25,6 +28,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="reservations/listReservations.php"><i class="fas fa-calendar-alt me-1"></i> Réservations</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <?php if (isLoggedIn()): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="auth/logout.php"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="auth/login.php"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
