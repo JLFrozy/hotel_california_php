@@ -1,12 +1,23 @@
 <?php
-// Inclusion du fichier de connexion à la base de données
 require_once '../config/db_connect.php';
-// Fonction pour formater les dates
+
+// La fonction pour formater les dates
 function formatDate($date)
 {
     $timestamp = strtotime($date);
     return date('d/m/Y', $timestamp);
 }
+
+// Récupération et affichage du message s'il existe
+if (isset($_GET['message'])) {
+    $message = urldecode($_GET['message']);
+    $alertClass = (strpos($message, 'ERREUR') !== false) ? 'alert-danger' : 'alert-success';
+    echo '<div class="alert ' . $alertClass . ' alert-dismissible fade show" role="alert">';
+    echo htmlspecialchars($message);
+    echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+    echo '</div>';
+}
+
 // Récupération des réservations avec les informations des clients et des chambres
 $conn = openDatabaseConnection();
 $query = "SELECT r.idReservation AS id, r.dateDebut AS date_arrivee, r.dateFin AS date_depart,
@@ -60,7 +71,7 @@ closeDatabaseConnection($conn);
         <h1>Liste des Réservations</h1>
 
         <div class="mb-3">
-            <a href="createReservation.php" class="btn btn-success">Nouvelle Réservation</a>
+            <a href="createReservation.php" class="btn btn-success"><i class="fas fa-plus me-1"></i> Nouvelle Réservation</a>
         </div>
 
         <table class="table table-striped table-bordered">
@@ -112,9 +123,9 @@ closeDatabaseConnection($conn);
                             <td><?= formatDate($reservation['date_depart']) ?></td>
                             <td class="<?= $statut_class ?>"><?= $statut ?></td>
                             <td>
-                                <a href="editReservation.php?id=<?= $reservation['id'] ?>" class="btn btn-primary btn-sm">Modifier</a>
+                                <a href="editReservation.php?id=<?= $reservation['id'] ?>" class="btn btn-primary btn-sm"><i class="fas fa-edit me-1"></i> Modifier</a>
                                 <a href="deleteReservation.php?id=<?= $reservation['id'] ?>" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation?');">
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation?');"><i class="fas fa-trash me-1"></i>
                                     Supprimer
                                 </a>
                             </td>

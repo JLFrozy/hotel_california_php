@@ -4,7 +4,8 @@ $conn = openDatabaseConnection();
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
-    header("Location: listChambres.php");
+    $encodedMessage = urlencode("ERREUR : ID de chambre invalide.");
+    header("Location: listChambres.php?message=$encodedMessage");
     exit;
 }
 
@@ -23,9 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         $stmt = $conn->prepare("UPDATE chambre SET numero = ?, capacite = ?, disponibilite = ? WHERE idChambre = ?");
-        $stmt->execute([$numero, $capacite, $disponibilite, $id]);
-        header("Location: listChambres.php?success=1");
-        exit;
+        if ($stmt->execute([$numero, $capacite, $disponibilite, $id])) {
+            $encodedMessage = urlencode("SUCCÈS : Chambre modifiée avec succès.");
+            header("Location: listChambres.php?message=$encodedMessage");
+            exit;
+        } else {
+            $encodedMessage = urlencode("ERREUR : Erreur lors de la modification de la chambre.");
+            header("Location: listChambres.php?message=$encodedMessage");
+            exit;
+        }
     }
 } else {
     $stmt = $conn->prepare("SELECT * FROM chambre WHERE idChambre = ?");
@@ -33,7 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $chambre = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$chambre) {
-        header("Location: listChambres.php");
+        $encodedMessage = urlencode("ERREUR : Chambre non trouvée.");
+        header("Location: listChambres.php?message=$encodedMessage");
         exit;
     }
 }
@@ -76,10 +84,11 @@ closeDatabaseConnection($conn);
         <h1 class="mb-4">Modifier une Chambre</h1>
 
         <?php if (isset($errors) && !empty($errors)): ?>
-            <div class="alert alert-danger">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <?php foreach ($errors as $error): ?>
                     <p class="mb-0"><?= $error ?></p>
                 <?php endforeach; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
 

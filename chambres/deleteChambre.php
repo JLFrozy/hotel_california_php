@@ -6,7 +6,7 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Vérifier si l'ID est valide
 if ($id <= 0) {
-    header("Location: listChambres.php?error=ID invalide");
+    header("Location: listChambres.php?message=" . urlencode("ERREUR : ID de chambre invalide."));
     exit;
 }
 
@@ -19,7 +19,7 @@ try {
     $chambre = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$chambre) {
-        header("Location: listChambres.php?error=Chambre non trouvée");
+        header("Location: listChambres.php?message=" . urlencode("ERREUR : Chambre non trouvée."));
         exit;
     }
 
@@ -38,17 +38,21 @@ try {
             $stmt->execute([$id]);
         } elseif ($hasReservations) {
             // Si la chambre a des réservations mais l'utilisateur ne veut pas les supprimer
-            header("Location: listChambres.php?error=Impossible de supprimer : la chambre a des réservations associées");
+            header("Location: listChambres.php?message=" . urlencode("ERREUR : Impossible de supprimer : la chambre a des réservations associées."));
             exit;
         }
 
         // Supprimer la chambre
         $stmt = $conn->prepare("DELETE FROM chambre WHERE idChambre = ?");
-        $stmt->execute([$id]);
-
-        // Rediriger vers la liste des chambres
-        header("Location: listChambres.php?success=Chambre supprimée avec succès");
-        exit;
+        if ($stmt->execute([$id])) {
+            // Rediriger vers la liste des chambres avec un message de succès
+            header("Location: listChambres.php?message=" . urlencode("SUCCÈS : Chambre supprimée avec succès."));
+            exit;
+        } else {
+            // Rediriger avec un message d'erreur si la suppression échoue
+            header("Location: listChambres.php?message=" . urlencode("ERREUR : Erreur lors de la suppression de la chambre."));
+            exit;
+        }
     }
 
     closeDatabaseConnection($conn);
@@ -112,18 +116,18 @@ try {
 
     <div class="container mt-4">
         <h1 class="mb-4">Supprimer une Chambre</h1>
-        
+
         <div class="warning-box">
             <p><strong>Attention :</strong> Vous êtes sur le point de supprimer la chambre numéro <?= htmlspecialchars($chambre['numero']) ?>.</p>
         </div>
-        
+
         <?php if ($hasReservations): ?>
             <div class="danger-box">
                 <p><strong>Cette chambre est associée à <?= $count ?> réservation(s).</strong></p>
                 <p>La suppression de cette chambre affectera les réservations existantes.</p>
             </div>
         <?php endif; ?>
-        
+
         <form method="post">
             <?php if ($hasReservations): ?>
                 <div class="form-check">
@@ -131,9 +135,9 @@ try {
                     <label class="form-check-label" for="delete_reservations">Supprimer également les <?= $count ?> réservation(s) associée(s) à cette chambre</label>
                 </div>
             <?php endif; ?>
-            
+
             <p>Êtes-vous sûr de vouloir supprimer cette chambre ?</p>
-            
+
             <div class="actions">
                 <input type="hidden" name="confirm" value="yes">
                 <button type="submit" class="btn btn-danger"><i class="fas fa-trash me-1"></i> Confirmer la suppression</button>

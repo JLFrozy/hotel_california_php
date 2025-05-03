@@ -5,7 +5,7 @@ $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Vérifier si l'ID est valide
 if ($id <= 0) {
-    header("Location: listClients.php?error=ID invalide");
+    header("Location: listClients.php?message=" . urlencode("ERREUR : ID de client invalide."));
     exit;
 }
 
@@ -18,7 +18,7 @@ try {
     $client = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$client) {
-        header("Location: listClients.php?error=Client non trouvé");
+        header("Location: listClients.php?message=" . urlencode("ERREUR : Client non trouvé."));
         exit;
     }
 
@@ -36,17 +36,21 @@ try {
             $stmt->execute([$id]);
         } elseif ($hasReservations) {
             // Si le client a des réservations mais l'utilisateur ne veut pas les supprimer
-            header("Location: listClients.php?error=Impossible de supprimer : le client a des réservations associées");
+            header("Location: listClients.php?message=" . urlencode("ERREUR : Impossible de supprimer : le client a des réservations associées."));
             exit;
         }
 
         // Supprimer le client
         $stmt = $conn->prepare("DELETE FROM client WHERE idClient = ?");
-        $stmt->execute([$id]);
-
-        // Rediriger vers la liste des clients
-        header("Location: listClients.php?success=Client supprimé avec succès");
-        exit;
+        if ($stmt->execute([$id])) {
+            // Rediriger vers la liste des clients avec un message de succès
+            header("Location: listClients.php?message=" . urlencode("SUCCÈS : Client supprimé avec succès."));
+            exit;
+        } else {
+            // Rediriger avec un message d'erreur si la suppression échoue
+            header("Location: listClients.php?message=" . urlencode("ERREUR : Erreur lors de la suppression du client."));
+            exit;
+        }
     }
 
     closeDatabaseConnection($conn);
@@ -110,18 +114,18 @@ try {
 
     <div class="container mt-4">
         <h1 class="mb-4">Supprimer un Client</h1>
-        
+
         <div class="warning-box">
             <p><strong>Attention :</strong> Vous êtes sur le point de supprimer le client <?= htmlspecialchars($client['nom']) ?>.</p>
         </div>
-        
+
         <?php if ($hasReservations): ?>
             <div class="danger-box">
                 <p><strong>Ce client est associé à <?= $count ?> réservation(s).</strong></p>
                 <p>La suppression de ce client affectera les réservations existantes.</p>
             </div>
         <?php endif; ?>
-        
+
         <form method="post">
             <?php if ($hasReservations): ?>
                 <div class="form-check">
@@ -129,9 +133,9 @@ try {
                     <label class="form-check-label" for="delete_reservations">Supprimer également les <?= $count ?> réservation(s) associée(s) à ce client</label>
                 </div>
             <?php endif; ?>
-            
+
             <p>Êtes-vous sûr de vouloir supprimer ce client ?</p>
-            
+
             <div class="actions">
                 <input type="hidden" name="confirm" value="yes">
                 <button type="submit" class="btn btn-danger"><i class="fas fa-trash me-1"></i> Confirmer la suppression</button>

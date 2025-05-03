@@ -1,5 +1,16 @@
 <?php
 require_once '../config/db_connect.php';
+
+// Récupération et affichage du message s'il existe
+if (isset($_GET['message'])) {
+    $message = urldecode($_GET['message']);
+    $alertClass = (strpos($message, 'ERREUR') !== false) ? 'alert-danger' : 'alert-success';
+    echo '<div class="alert ' . $alertClass . ' alert-dismissible fade show" role="alert">';
+    echo htmlspecialchars($message);
+    echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+    echo '</div>';
+}
+
 $conn = openDatabaseConnection();
 $stmt = $conn->query("SELECT * FROM chambre ORDER BY numero");
 $chambres = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -25,7 +36,7 @@ closeDatabaseConnection($conn);
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="../chambres/listChambres.php"><i class="fas fa-bed me-1"></i> Chambres</a>
+                        <a class="nav-link active" href="../chambres/listChambres.php"><i class="fas fa-bed me-1"></i> Chambres</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="../clients/listClients.php"><i class="fas fa-users me-1"></i> Clients</a>
@@ -39,8 +50,10 @@ closeDatabaseConnection($conn);
     </nav>
 
     <div class="container mt-4">
-        <h1 class="mb-4">Liste des Chambres</h1>
-        <a href="createChambre.php" class="btn btn-primary mb-3"><i class="fas fa-plus me-1"></i> Ajouter une chambre</a>
+        <h1>Liste des Chambres</h1>
+        <div class="mb-3">
+            <a href="createChambre.php" class="btn btn-success"><i class="fas fa-plus me-1"></i> Ajouter une Chambre</a>
+        </div>
         <table class="table table-striped table-bordered">
             <thead class="table-dark">
                 <tr>
@@ -52,18 +65,22 @@ closeDatabaseConnection($conn);
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($chambres as $chambre): ?>
-                    <tr>
-                        <td><?php echo $chambre['idChambre']; ?></td>
-                        <td><?= $chambre['numero'] ?></td> 
-                        <td><?= $chambre['capacite'] ?></td>
-                        <td><?= $chambre['disponibilite'] ? 'Oui' : 'Non' ?></td>
-                        <td>
-                            <a href="editChambre.php?id=<?= $chambre['idChambre'] ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Modifier</a>
-                            <a href="deleteChambre.php?id=<?= $chambre['idChambre'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr?')"><i class="fas fa-trash"></i> Supprimer</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+                <?php if (count($chambres) > 0): ?>
+                    <?php foreach ($chambres as $chambre): ?>
+                        <tr>
+                            <td><?= $chambre['idChambre'] ?></td>
+                            <td><?= htmlspecialchars($chambre['numero']) ?></td>
+                            <td><?= $chambre['capacite'] ?></td>
+                            <td><?= $chambre['disponibilite'] ? 'Oui' : 'Non' ?></td>
+                            <td>
+                                <a href="editChambre.php?id=<?= $chambre['idChambre'] ?>" class="btn btn-primary btn-sm"><i class="fas fa-edit me-1"></i> Modifier</a>
+                                <a href="deleteChambre.php?id=<?= $chambre['idChambre'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette chambre ?');"><i class="fas fa-trash me-1"></i> Supprimer</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr><td colspan="5" class="text-center">Aucune chambre trouvée.</td></tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>

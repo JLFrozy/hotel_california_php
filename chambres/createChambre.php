@@ -4,12 +4,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $numero = $_POST['numero'];
     $capacite = (int)$_POST['capacite'];
     $disponibilite = isset($_POST['disponibilite']) ? 1 : 0;
+
+    // Validation des données (ajoutée pour l'exemple)
+    $errors = [];
+    if (empty($numero)) {
+        $errors[] = "Le numéro de chambre est obligatoire.";
+    }
+    if ($capacite <= 0) {
+        $errors[] = "La capacité doit être un nombre positif.";
+    }
+
+    if (!empty($errors)) {
+        $encodedMessage = urlencode("ERREUR : " . implode("<br>", $errors));
+        header("Location: listChambres.php?message=$encodedMessage");
+        exit;
+    }
+
     $conn = openDatabaseConnection();
     $stmt = $conn->prepare("INSERT INTO chambre (numero, capacite, disponibilite) VALUES (?, ?, ?)");
-    $stmt->execute([$numero, $capacite, $disponibilite]);
+    if ($stmt->execute([$numero, $capacite, $disponibilite])) {
+        $encodedMessage = urlencode("SUCCÈS : Chambre ajoutée avec succès.");
+        header("Location: listChambres.php?message=$encodedMessage");
+        exit;
+    } else {
+        $encodedMessage = urlencode("ERREUR : Erreur lors de l'ajout de la chambre.");
+        header("Location: listChambres.php?message=$encodedMessage");
+        exit;
+    }
     closeDatabaseConnection($conn);
-    header("Location: listChambres.php");
-    exit;
 }
 ?>
 <!DOCTYPE html>

@@ -7,17 +7,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $nbPersonnes = (int)$_POST['nbPersonnes'];
 
+    $errors = [];
+    if (empty($nom)) {
+        $errors[] = "Le nom est obligatoire.";
+    }
+    if (empty($telephone)) {
+        $errors[] = "Le numéro de téléphone est obligatoire.";
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "L'adresse email n'est pas valide.";
+    }
+    if ($nbPersonnes <= 0) {
+        $errors[] = "Le nombre de personnes doit être positif.";
+    }
+
+    if (!empty($errors)) {
+        $encodedMessage = urlencode("ERREUR : " . implode("<br>", $errors));
+        header("Location: listClients.php?message=$encodedMessage");
+        exit;
+    }
+
     try {
         $conn = openDatabaseConnection();
         $stmt = $conn->prepare("INSERT INTO client (nom, telephone, email, nbPersonnes) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$nom, $telephone, $email, $nbPersonnes]);
+        if ($stmt->execute([$nom, $telephone, $email, $nbPersonnes])) {
+            $encodedMessage = urlencode("SUCCÈS : Client ajouté avec succès.");
+            header("Location: listClients.php?message=$encodedMessage");
+            exit;
+        } else {
+            $encodedMessage = urlencode("ERREUR : Erreur lors de l'ajout du client.");
+            header("Location: listClients.php?message=$encodedMessage");
+            exit;
+        }
         closeDatabaseConnection($conn);
-
-        header("Location: listClients.php?success=Client ajouté avec succès");
-        exit;
     } catch (PDOException $e) {
         closeDatabaseConnection($conn);
-        die("Erreur lors de l'ajout du client : " . $e->getMessage());
+        $encodedMessage = urlencode("ERREUR : Erreur de base de données : " . $e->getMessage());
+        header("Location: listClients.php?message=$encodedMessage");
+        exit;
     }
 }
 ?>
@@ -57,6 +84,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container mt-4">
         <h1 class="mb-4">Ajouter un Client</h1>
         <form method="post">
+            <?php if (isset($errors) && !empty($errors)): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?php foreach ($errors as $error): ?>
+                        <p class="mb-0"><?= $error ?></p>
+                    <?php endforeach; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
             <div class="mb-3">
                 <label for="nom" class="form-label">Nom</label>
                 <input type="text" class="form-control" id="nom" name="nom" required>

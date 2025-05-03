@@ -1,6 +1,16 @@
 <?php
 require_once '../config/db_connect.php';
 
+// Récupération et affichage du message s'il existe
+if (isset($_GET['message'])) {
+    $message = urldecode($_GET['message']);
+    $alertClass = (strpos($message, 'ERREUR') !== false) ? 'alert-danger' : 'alert-success';
+    echo '<div class="alert ' . $alertClass . ' alert-dismissible fade show" role="alert">';
+    echo htmlspecialchars($message);
+    echo '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+    echo '</div>';
+}
+
 try {
     $conn = openDatabaseConnection();
     $stmt = $conn->query("SELECT * FROM client ORDER BY nom");
@@ -46,20 +56,6 @@ try {
 
     <div class="container mt-4">
         <h1 class="mb-4">Liste des Clients</h1>
-
-        <?php if (isset($_GET['success'])): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_GET['success']) ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        <?php endif; ?>
-
-        <?php if (isset($_GET['error'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_GET['error']) ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        <?php endif; ?>
 
         <a href="createClient.php" class="btn btn-primary mb-3"><i class="fas fa-plus me-1"></i> Ajouter un client</a>
         <table class="table table-striped table-bordered">
