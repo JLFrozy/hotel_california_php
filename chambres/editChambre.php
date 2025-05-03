@@ -1,7 +1,7 @@
 <?php
 require_once '../config/db_connect.php';
 require_once '../auth/authFunctions.php';
-requireRole("manager"); // Rôle requis pour modifier une chambre
+requireRole("manager");
 
 include_once '../assets/gestionMessage.php';
 ?>

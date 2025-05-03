@@ -1,6 +1,8 @@
 <?php
 require_once '../config/db_connect.php';
-
+require_once '../auth/authFunctions.php';
+requireRole("manager");
+include_once '../assets/gestionMessage.php';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Vérifier si l'ID est valide
