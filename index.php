@@ -1,5 +1,6 @@
 <?php
 require_once 'auth/authFunctions.php';
+include_once 'assets/gestionMessage.php';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
