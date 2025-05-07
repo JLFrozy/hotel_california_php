@@ -2,6 +2,7 @@
 require_once '../config/db_connect.php';
 require_once 'authFunctions.php';
 
+// Initialisation du message d'erreur
 $errorMessage = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -10,9 +11,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $conn = openDatabaseConnection();
     if (authenticateUser($username, $password, $conn)) {
+        // Redirection vers la page d'accueil avec un message de succès
         header("Location: /HOTEL_CALIFORNIA_PHP/index.php?message=" . urlencode("SUCCÈS : Connexion réussie."));
         exit;
     } else {
+        // Affichage d'un message d'erreur en cas d'échec
         $errorMessage = "ERREUR : Nom d'utilisateur ou mot de passe incorrect.";
     }
     closeDatabaseConnection($conn);
