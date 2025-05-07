@@ -1,29 +1,35 @@
-/* assets/style.css */
+/* Définition de la couleur de fond de la page */
 body {
-    background-color: #f8f9fa;
+    background-color: #f8f9fa; 
 }
 
+/* Style pour l'image de l'hôtel */
 .hotel-image {
-    max-width: 100%;
-    height: auto;
+    max-width: 100%; /* S'assure que l'image ne dépasse pas la largeur du conteneur */
+    height: auto; /* Maintient le ratio de l'image */
 }
 
+/* Style pour la barre de navigation */
 .navbar {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Style pour le conteneur principal */
 .container {
-    max-width: 1200px;
+    max-width: 1200px; 
 }
 
+/* Style pour les titres principaux */
 h1 {
-    color: #343a40;
+    color: #343a40; /* Couleur sombre pour contraste */
 }
 
+/* Style pour les cellules du tableau */
 .table th, .table td {
-    vertical-align: middle;
+    vertical-align: middle; /* Centre verticalement le contenu des cellules */
 }
 
+/* Style pour les boutons avec icônes */
 .btn i {
-    margin-right: 5px;
+    margin-right: 5px; /* Espace entre l'icône et le texte du bouton */
 }
