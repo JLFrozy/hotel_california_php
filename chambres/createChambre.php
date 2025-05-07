@@ -4,7 +4,56 @@ require_once '../auth/authFunctions.php';
 requireRole("directeur"); // Rôle requis pour créer une chambre
 
 include_once '../assets/gestionMessage.php';
+
+// Traitement du formulaire si soumis
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $numero = $_POST['numero'] ?? '';
+    $capacite = isset($_POST['capacite']) ? (int)$_POST['capacite'] : 0;
+    $disponibilite = isset($_POST['disponibilite']) && $_POST['disponibilite'] === '1' ? 1 : 0;
+
+    // Validation des données
+    $errors = [];
+
+    if (empty($numero)) {
+        $errors[] = "Le numéro de chambre est obligatoire.";
+    }
+
+    if ($capacite <= 0) {
+        $errors[] = "La capacité doit être un nombre positif.";
+    }
+
+    // Vérifier si le numéro de chambre existe déjà
+    try {
+        $conn = openDatabaseConnection();
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM chambre WHERE numero = ?");
+        $stmt->execute([$numero]);
+        if ($stmt->fetchColumn() > 0) {
+            $errors[] = "Ce numéro de chambre existe déjà.";
+        }
+    } catch (PDOException $e) {
+        $errors[] = "Erreur lors de la vérification du numéro de chambre : " . $e->getMessage();
+    }
+
+    // Si pas d'erreurs, insérer la chambre
+    if (empty($errors)) {
+        try {
+            $stmt = $conn->prepare("INSERT INTO chambre (numero, capacite, disponibilite) VALUES (?, ?, ?)");
+            if ($stmt->execute([$numero, $capacite, $disponibilite])) {
+                $encodedMessage = urlencode("SUCCÈS : Chambre ajoutée avec succès.");
+                header("Location: listChambres.php?message=$encodedMessage");
+                exit;
+            } else {
+                $errors[] = "Erreur lors de l'ajout de la chambre.";
+            }
+        } catch (PDOException $e) {
+            $errors[] = "Erreur de base de données : " . $e->getMessage();
+        }
+    }
+
+    closeDatabaseConnection($conn);
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -51,17 +100,25 @@ include_once '../assets/gestionMessage.php';
 
     <div class="container mt-4">
         <h1 class="mb-4">Ajouter une Chambre</h1>
+        <?php if (isset($errors) && !empty($errors)): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?php foreach ($errors as $error): ?>
+                    <p class="mb-0"><?= htmlspecialchars($error) ?></p>
+                <?php endforeach; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
         <form method="post">
             <div class="mb-3">
                 <label for="numero" class="form-label">Numéro de Chambre</label>
-                <input type="text" class="form-control" id="numero" name="numero" required>
+                <input type="text" class="form-control" id="numero" name="numero" value="<?= isset($_POST['numero']) ? htmlspecialchars($_POST['numero']) : '' ?>" required>
             </div>
             <div class="mb-3">
                 <label for="capacite" class="form-label">Capacité (nombre de personnes)</label>
-                <input type="number" class="form-control" id="capacite" name="capacite" min="1" required>
+                <input type="number" class="form-control" id="capacite" name="capacite" min="1" value="<?= isset($_POST['capacite']) ? htmlspecialchars($_POST['capacite']) : '' ?>" required>
             </div>
             <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="disponibilite" name="disponibilite" value="1" checked>
+                <input type="checkbox" class="form-check-input" id="disponibilite" name="disponibilite" value="1" <?= isset($_POST['disponibilite']) && $_POST['disponibilite'] === '1' ? 'checked' : 'checked' ?>>
                 <label class="form-check-label" for="disponibilite">Disponible</label>
             </div>
             <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Enregistrer</button>
