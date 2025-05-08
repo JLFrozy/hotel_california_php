@@ -2,6 +2,7 @@
 require_once '../config/db_connect.php';
 require_once '../auth/authFunctions.php';
 requireRole("standard"); // Rôle requis pour créer une réservation
+include_once '../assets/gestionMessage.php';
 
 $conn = openDatabaseConnection();
 $clients = $conn->query("SELECT idClient, nom FROM client ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);

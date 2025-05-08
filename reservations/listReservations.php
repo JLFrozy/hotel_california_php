@@ -1,21 +1,18 @@
 <?php
 require_once '../config/db_connect.php';
 require_once '../auth/authFunctions.php';
-requireRole("standard"); // Rôle requis 
-// La fonction pour formater les dates
+requireRole("standard"); // Rôle requis pour voir les réservations
+include_once '../assets/gestionMessage.php';
+
+/**
+ * Formate une date au format jj/mm/aaaa.
+ * @param string $date La date au format ISO (YYYY-MM-DD).
+ * @return string La date formatée (jj/mm/aaaa).
+ */
 function formatDate($date)
 {
     $timestamp = strtotime($date);
     return date('d/m/Y', $timestamp);
-}
-
-include_once '../assets/gestionMessage.php'; ?>
-
-<?php
-// Vérification de l'authentification plus tard
-if (!isLoggedIn() || !hasRole("standard")) {
-    header("Location: ../auth/login.php?message=" . urlencode("Vous devez être connecté pour accéder à la liste des réservations."));
-    exit;
 }
 
 // Récupération des réservations (ce code ne s'exécutera que si l'utilisateur est autorisé)

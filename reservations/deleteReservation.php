@@ -2,6 +2,8 @@
 require_once '../config/db_connect.php';
 require_once '../auth/authFunctions.php';
 requireRole("manager"); 
+// Inclusion du fichier gestionMessage.php
+include_once '../assets/gestionMessage.php';
 $id = $_GET['id'];
 
 try {
