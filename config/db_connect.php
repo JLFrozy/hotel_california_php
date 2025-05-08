@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Ouvre une connexion à la base de données MySQL.
+ * @return PDO La connexion PDO à la base de données.
+ */
 function openDatabaseConnection() {
     $host = 'localhost'; // Hôte de la base de données
     $db = 'hotel_california'; // Nom de la base de données
