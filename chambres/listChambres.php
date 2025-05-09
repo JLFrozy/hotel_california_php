@@ -6,15 +6,10 @@ requireRole("standard"); // Rôle requis pour la liste des chambres
 // Inclusion du fichier gestionMessage.php
 include_once '../assets/gestionMessage.php';
 
-try {
-    $conn = openDatabaseConnection();
-    $stmt = $conn->query("SELECT * FROM chambre ORDER BY numero");
-    $chambres = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    closeDatabaseConnection($conn);
-} catch (PDOException $e) {
-    closeDatabaseConnection($conn);
-    die("Erreur lors de la récupération des chambres : " . $e->getMessage());
-}
+$conn = openDatabaseConnection();
+$stmt = $conn->query("SELECT * FROM chambre ORDER BY numero");
+$chambres = $stmt->fetchAll(PDO::FETCH_ASSOC);
+closeDatabaseConnection($conn);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
