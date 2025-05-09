@@ -30,14 +30,23 @@ function hasRole($required_role) {
         'interimaire' => 7, // employé temporaire
         'client' => 8 // éventuellement les client...
     ];
+
     // Récupérer le niveau requis
-    $required_level = $role_levels[$required_role] ?? 10;
+    if (isset($role_levels[$required_role])) {
+        $required_level = $role_levels[$required_role];
+    } else {
+        $required_level = 10;
+    }
 
     // Récupérer le rôle actuel de l'employé
     $user_role = $_SESSION['role'] ?? '';
 
+
     // Déterminer le niveau de l'employé
-    $user_level = $role_levels[$user_role] ?? 10;
+    $user_level = isset($role_levels[$user_role]) ? $role_levels[$user_role] : 10;
+    error_log("Check role : user=".$user_level." required=".$required_level);
+    // L'utilisateur a accès si son niveau est inférieur ou égal au niveau requis
+    // (plus le niveau est bas, plus les droits sont élevés)
     return $user_level <= $required_level;
 }
 // Authentifier un employé
