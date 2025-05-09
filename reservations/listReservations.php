@@ -15,7 +15,7 @@ function formatDate($date)
     return date('d/m/Y', $timestamp);
 }
 
-// Récupération des réservations (ce code ne s'exécutera que si l'utilisateur est autorisé)
+// Récupération des réservations 
 $conn = openDatabaseConnection();
 $query = "SELECT r.idReservation AS id, r.dateDebut AS date_arrivee, r.dateFin AS date_depart,
     cl.nom AS client_nom, cl.telephone AS client_telephone, cl.email AS client_email,
